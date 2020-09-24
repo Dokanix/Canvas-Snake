@@ -30,6 +30,10 @@ button {
   border-radius: 10px;
 }
 
+button:hover {
+  cursor: pointer;
+}
+
 .buttons {
   position: absolute;
   left: 50%;
@@ -51,4 +55,17 @@ h1 {
   left: 50%;
   transform: translate(-50%);
   text-transform: uppercase;
+}
+
+.restart {
+  font-size: 10em;
+  position: absolute;
+  background-color: blue;
+  left: 50%;
+  transform: translate(-50%);
+  top: 40%;
+}
+
+.hidden {
+  display: none;
 }

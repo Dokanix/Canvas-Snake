@@ -2,12 +2,12 @@ const canvas = document.querySelector("canvas");
 // const cellAdder = document.querySelector(".cell-adder");
 const slowButton = document.querySelector(".slower");
 const fastButton = document.querySelector(".faster");
-const header = document.querySelector("h1");
+const restartButton = document.querySelector(".restart");
 const c = canvas.getContext("2d");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
-let speed = 3;
+let speed = 10;
 
 class Fruit {
   constructor(x, y) {
@@ -90,8 +90,8 @@ class Player {
 }
 
 const gameOver = () => {
-  header.textContent = "Game Over";
   clearInterval(interval);
+  restartButton.classList.remove("hidden");
 }
 
 const fruits = [];
@@ -170,5 +170,11 @@ slowButton.addEventListener("click", () => {
 fastButton.addEventListener("click", () => {
   speed *= 2;
   clearInterval(interval);
+  interval = setInterval(update, 1000 / speed);
+})
+
+restartButton.addEventListener("click", () => {
+  restartButton.classList.add("hidden");
+  player.cells = [new Cell(canvas.width / 2, canvas.height / 2)];
   interval = setInterval(update, 1000 / speed);
 })
