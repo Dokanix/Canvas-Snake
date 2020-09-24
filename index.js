@@ -1,10 +1,13 @@
 const canvas = document.querySelector("canvas");
 const cellAdder = document.querySelector(".cell-adder");
+const slowButton = document.querySelector(".slower");
+const fastButton = document.querySelector(".faster");
+const header = document.querySelector("h1");
 const c = canvas.getContext("2d");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
-const SPEED = 1;
+let speed = 1;
 
 class Cell {
   constructor(x, y) {
@@ -40,6 +43,11 @@ class Player {
       case "right":
         this.cells[this.cells.length - 1].x += this.size;
     }
+
+    if (this.collision()) {
+      gameOver();
+    }
+
   };
 
   addCell = () => {
@@ -49,6 +57,26 @@ class Player {
 
     this.cells.unshift(cell);
   };
+
+  collision = () => {
+    const head = this.cells[this.cells.length - 1];
+
+    if (head.x < 0 || head.x > canvas.width || head.y < 0 || head.y > canvas.height) {
+      return true;
+    }
+
+    for (let i = 0; i < this.cells.length - 2; i++) {
+      if (head.x == this.cells[i].x && head.y == this.cells[i].y) {
+        return true;
+      }
+    }
+    return false;
+  }
+}
+
+const gameOver = () => {
+  header.textContent = "Game Over";
+  clearInterval(interval);
 }
 
 const player = new Player();
@@ -65,9 +93,7 @@ const draw = () => {
   player.movePosition();
 
   c.fillStyle = player.color;
-  console.log("-----------");
   for (const cell of player.cells) {
-    console.log(cell);
     c.fillRect(cell.x, cell.y, player.size, player.size);
   }
 };
@@ -94,4 +120,16 @@ addEventListener("keydown", (event) => {
   }
 });
 
-setInterval(draw, 1000 / SPEED);
+let interval = setInterval(draw, 1000 / speed);
+
+slowButton.addEventListener("click", () => {
+  speed /= 2;
+  clearInterval(interval);
+  interval = setInterval(draw, 1000 / speed);
+})
+
+fastButton.addEventListener("click", () => {
+  speed *= 2;
+  clearInterval(interval);
+  interval = setInterval(draw, 1000 / speed);
+})
