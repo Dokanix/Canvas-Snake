@@ -1,13 +1,10 @@
 const canvas = document.querySelector("canvas");
-// const cellAdder = document.querySelector(".cell-adder");
-const slowButton = document.querySelector(".slower");
-const fastButton = document.querySelector(".faster");
 const restartButton = document.querySelector(".restart");
 const c = canvas.getContext("2d");
 canvas.width = innerWidth;
 canvas.height = innerHeight;
 
-let speed = 10;
+let speed = 13;
 
 class Fruit {
   constructor(x, y) {
@@ -37,6 +34,8 @@ class Player {
       this.cells[i].y = this.cells[i + 1].y;
     }
 
+    lastDirection = this.direction;
+
     switch (this.direction) {
       case "up":
         this.cells[this.cells.length - 1].y -= this.size;
@@ -55,14 +54,16 @@ class Player {
       gameOver();
     }
 
-
     fruits.forEach((fruit, fruitIndex) => {
-      if (this.cells[this.cells.length - 1].x == fruit.x && this.cells[this.cells.length - 1].y == fruit.y) {
+      if (
+        this.cells[this.cells.length - 1].x == fruit.x &&
+        this.cells[this.cells.length - 1].y == fruit.y
+      ) {
         this.addCell();
         fruits.splice(fruits[fruitIndex]);
         spawnFruit();
       }
-    })
+    });
   };
 
   addCell = () => {
@@ -76,7 +77,12 @@ class Player {
   collision = () => {
     const head = this.cells[this.cells.length - 1];
 
-    if (head.x < 0 || head.x > canvas.width || head.y < 0 || head.y > canvas.height) {
+    if (
+      head.x < 0 ||
+      head.x > canvas.width ||
+      head.y < 0 ||
+      head.y > canvas.height
+    ) {
       return true;
     }
 
@@ -86,13 +92,14 @@ class Player {
       }
     }
     return false;
-  }
+  };
 }
 
 const gameOver = () => {
   clearInterval(interval);
+  c.clearRect(0, 0, canvas.width, canvas.height);
   restartButton.classList.remove("hidden");
-}
+};
 
 const fruits = [];
 let round = 0;
@@ -103,15 +110,16 @@ const player = new Player();
 const spawnFruit = () => {
   let x = canvas.width / 2;
   let y = canvas.height / 2;
-  let randomOffset = Math.floor(Math.random() * 10 - 5) * player.size; 
+  let randomOffset = Math.floor(Math.random() * 10 - 5) * player.size;
   x = x + randomOffset;
-  randomOffset = Math.floor(Math.random() * 10 - 5) * player.size; 
+  randomOffset = Math.floor(Math.random() * 10 - 5) * player.size;
   y = y + randomOffset;
 
   fruits.push(new Fruit(x, y));
-}
+};
 
 spawnFruit();
+let lastDirection = "right";
 
 const update = () => {
   const directionText = document.querySelector(".direction");
@@ -124,7 +132,6 @@ const update = () => {
   c.clearRect(0, 0, canvas.width, canvas.height);
 
   player.movePosition();
-
 
   c.fillStyle = player.color;
   for (const cell of player.cells) {
@@ -140,16 +147,24 @@ const update = () => {
 addEventListener("keydown", (event) => {
   switch (event.key) {
     case "a":
-      player.direction = "left";
+      if (lastDirection != "right") {
+        player.direction = "left";
+      }
       break;
     case "d":
-      player.direction = "right";
+      if (lastDirection != "left") {
+        player.direction = "right";
+      }
       break;
     case "w":
-      player.direction = "up";
+      if (lastDirection != "down") {
+        player.direction = "up";
+      }
       break;
     case "s":
-      player.direction = "down";
+      if (lastDirection != "up") {
+        player.direction = "down";
+      }
       break;
     case "n":
       update();
@@ -161,20 +176,8 @@ addEventListener("keydown", (event) => {
 
 let interval = setInterval(update, 1000 / speed);
 
-slowButton.addEventListener("click", () => {
-  speed /= 2;
-  clearInterval(interval);
-  interval = setInterval(update, 1000 / speed);
-})
-
-fastButton.addEventListener("click", () => {
-  speed *= 2;
-  clearInterval(interval);
-  interval = setInterval(update, 1000 / speed);
-})
-
 restartButton.addEventListener("click", () => {
   restartButton.classList.add("hidden");
   player.cells = [new Cell(canvas.width / 2, canvas.height / 2)];
   interval = setInterval(update, 1000 / speed);
-})
+});
